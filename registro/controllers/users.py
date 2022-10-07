@@ -2,7 +2,7 @@ from registro import app
 from flask_bcrypt import Bcrypt
 from flask import request,flash,render_template,redirect,session 
 from registro.models.user import User
-
+from registro.models.libro import Libro
 
 bcrypt = Bcrypt(app)
 
@@ -61,4 +61,16 @@ def login():
 
 @app.route('/dashboard')
 def dashboard():
-    return render_template("index.html")
+    data={
+        "owner_id":session['user_id']
+    }
+    libros=Libro.get_all_books() # lista de libros con owners
+    libros_propios=Libro.get_books_by_owner(data) # lista de libros del owners
+    return render_template("index.html",libros=libros,libros_propios=libros_propios)
+
+@app.route('/logout')
+def logout():
+    if 'user_id' in session:
+        del session['user_id']
+    
+    return redirect("/")
